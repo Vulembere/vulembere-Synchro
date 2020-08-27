@@ -51,7 +51,7 @@ public final class Local {
                                 if (object.equalsIgnoreCase(sqlData.coloneSyncho)) {
                                     pst.setInt(j, 1);
                                 } else {
-                                    pst.setString(j, ob.get(object).toString());
+                                    pst.setObject(j, ob.get(object));
                                 }
                             }
                             pst.setString(sqlData.getColoneListe().size(), ob.getString(sqlData.getColoneListe().get(0)));
@@ -78,7 +78,7 @@ public final class Local {
                             if (object.equalsIgnoreCase(sqlData.coloneSyncho)) {
                                 pst.setInt(j + 1, 1);
                             } else {
-                                pst.setString(j + 1, ob.get(object).toString());
+                                pst.setObject(j, ob.get(object));
                             }
                         }
                         pst.execute();

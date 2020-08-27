@@ -42,10 +42,10 @@ public class SqlData {
     public static ArrayList<String> tempo = new ArrayList();
     public static Map<String, Blob> ColoneImage = new HashMap();
 
-    public ObservableList<ArrayList<String>> getAllData() {
+    public ObservableList<ArrayList<String>> getAllData(Boolean addImage) {
         ObservableList<ArrayList<String>> detailles = FXCollections.observableArrayList();
 
-        String col = traitement.getColoneTable(table, this);
+        String col = traitement.getColoneTable(table, this, addImage);
         if (con != null) {
             try {
                 String rqt = "select " + col + " from " + this.table + " " + this.coloneStatut;
@@ -70,6 +70,7 @@ public class SqlData {
         } else {
             System.out.println("Erreur de connexion");
         }
+
         return detailles;
     }
 
@@ -96,9 +97,10 @@ public class SqlData {
     public String databanse;
 
     /**
-     *url Uril de base
+     * url Uril de base
      */
-    public String url = "https://finup.uptodatedevelopers.com/api/finup/root/index.php";
+//    public String url = "http://localhost/standardApi/index.php";
+    public String url = "https://finup.uptodatedevelopers.com/api/finup/index.php";
 
     public String POST(String DATA_, String COLONES) {
 //        System.err.println(DATA_);
@@ -108,10 +110,10 @@ public class SqlData {
             connecion.setDoOutput(true);
             StringBuilder content;
             try (PrintStream ps = new PrintStream(connecion.getOutputStream())) {
-                ps.print("DATA_=" + DATA_);
+                ps.print("CONFIG=" + this.host + "," + this.databanse + "," + this.user + "," + this.password + "," + this.port + "," + this.colone_reference);
+                ps.print("&DATA_=" + DATA_);
                 ps.print("&COLONES=" + COLONES);
                 ps.print("&TABLE=" + this.table);
-                ps.print("&CONFIG=" + this.host + "," + this.databanse + "," + this.user + "," + this.password + "," + this.port + "," + this.colone_reference);
                 connecion.getInputStream();
                 BufferedReader bufferedReader;
                 bufferedReader = new BufferedReader(new InputStreamReader(connecion.getInputStream(), "UTF8"));
@@ -120,7 +122,8 @@ public class SqlData {
                 String line;
                 while ((line = bufferedReader.readLine()) != null) {
                     content.append(line).append("\n");
-                }   bufferedReader.close();
+                }
+                bufferedReader.close();
             }
             return content.toString();
         } catch (MalformedURLException ex) {
@@ -131,18 +134,20 @@ public class SqlData {
         return null;
     }
 
-    public String synchronise() {
+    public String synchronise(Boolean addImage) {
+
+        this.ColoneListe.clear();
         ObservableList<ArrayList<String>> liste = FXCollections.observableArrayList();
 
-        liste = this.getAllData();
+        liste = this.getAllData(addImage);
 
         ArrayList<String> Colone = this.getColoneListe();
         this.colone_reference = Colone.get(0);
         String data = Json.JsonFormat(liste, Colone);
 
         String colone = traitement.getString(Colone);
-
         String txt = this.POST(data, colone);
+
         return txt;
     }
 
